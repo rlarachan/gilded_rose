@@ -27,6 +27,15 @@ describe GildedRose do
 
         end
       end
+
+      context "result quality value decreases is less than 0" do
+        it "sets quality to 0" do
+          item.sell_in = 2
+          item.quality = 0
+          gilded_rose.update_quality
+          expect(item.quality).to eq 0
+        end
+      end
     end
 
     context "Sulfuras" do
@@ -68,6 +77,15 @@ describe GildedRose do
           item.sell_in = -1
           gilded_rose.update_quality
           expect(item.quality).to eq 22
+        end
+      end
+
+      context "result quality value increases to more than 50" do
+        it "sets quality to 50" do
+          item.sell_in = 48
+          item.quality = 50
+          gilded_rose.update_quality
+          expect(item.quality).to eq 50
         end
       end
     end
@@ -112,6 +130,15 @@ describe GildedRose do
           expect(item.quality).to eq 0
         end
       end
+
+      context "result quality value increases to more than 50" do
+        it "sets quality to 50" do
+          item.sell_in = 1
+          item.quality = 48
+          gilded_rose.update_quality
+          expect(item.quality).to eq 50
+        end
+      end
     end
 
     context "Conjured" do
@@ -138,6 +165,53 @@ describe GildedRose do
           expect(item.quality).to eq 16
         end
       end
+
+      context "result quality value decreases is less than 0" do
+        it "sets quality to 0" do
+          item.sell_in = 2
+          item.quality = 0
+          gilded_rose.update_quality
+          expect(item.quality).to eq 0
+        end
+      end
+
     end
   end
+
+  describe "#quality_up" do
+    context "result quality value increases to more than 50" do
+      it "sets quality to 50" do
+        item.quality = 48
+        gilded_rose.send(:quality_up, item, 3)
+        expect(item.quality).to eq 50
+      end
+    end
+
+    context "result quality value increases to less than or equal to 50" do
+      it "increases quality by set value" do
+        item.quality = 10
+        gilded_rose.send(:quality_up, item, 5)
+        expect(item.quality).to eq 15
+      end
+    end
+  end
+
+  describe "#quality_down" do
+    context "result quality value decreases to less than 0" do
+      it "sets quality to 0" do
+        item.quality = 2
+        gilded_rose.send(:quality_down, item, 3)
+        expect(item.quality).to eq 0
+      end
+    end
+
+    context "result quality value decreases to greater than or equal to 0" do
+      it "decreases quality by set value" do
+        item.quality = 10
+        gilded_rose.send(:quality_down, item, 5)
+        expect(item.quality).to eq 5
+      end
+    end
+  end
+
 end
