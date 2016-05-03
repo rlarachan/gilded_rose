@@ -4,52 +4,58 @@ class GildedRose
     @items = items
   end
 
-  def update_quality()
+  def update_quality
     @items.each do |item|
-      if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert"
-        if item.quality > 0
-          if item.name != "Sulfuras, Hand of Ragnaros"
-            item.quality = item.quality - 1
-          end
+      next if item.name == "Sulfuras, Hand of Ragnaros"
+      item.sell_in -= 1
+
+      case item.name
+      when "Aged Brie"
+        if item.sell_in >= 0
+          quality_up(item, 1)
+        else
+          quality_up(item, 2)
+        end
+
+      when "Backstage passes to a TAFKAL80ETC concert"
+        case
+        when item.sell_in > 10
+          quality_up(item, 1)
+        when item.sell_in.between?(6, 10)
+          quality_up(item, 2)
+        when item.sell_in.between?(0, 5)
+          quality_up(item, 3)
+        else
+          item.quality = 0
+        end
+
+      when "Conjured"
+        if item.sell_in >= 0
+          quality_down(item, 2)
+        else
+          quality_down(item, 4)
         end
       else
-        if item.quality < 50
-          item.quality = item.quality + 1
-          if item.name == "Backstage passes to a TAFKAL80ETC concert"
-            if item.sell_in < 11
-              if item.quality < 50
-                item.quality = item.quality + 1
-              end
-            end
-            if item.sell_in < 6
-              if item.quality < 50
-                item.quality = item.quality + 1
-              end
-            end
-          end
-        end
-      end
-      if item.name != "Sulfuras, Hand of Ragnaros"
-        item.sell_in = item.sell_in - 1
-      end
-      if item.sell_in < 0
-        if item.name != "Aged Brie"
-          if item.name != "Backstage passes to a TAFKAL80ETC concert"
-            if item.quality > 0
-              if item.name != "Sulfuras, Hand of Ragnaros"
-                item.quality = item.quality - 1
-              end
-            end
-          else
-            item.quality = item.quality - item.quality
-          end
+        if item.sell_in >= 0
+          quality_down(item, 1)
         else
-          if item.quality < 50
-            item.quality = item.quality + 1
-          end
+          quality_down(item, 2)
         end
       end
+
     end
+  end
+
+private
+
+  def quality_up(item, value)
+    sum = item.quality + value
+    item.quality = sum > 50 ? 50 : sum
+  end
+
+  def quality_down(item, value)
+    diff = item.quality - value
+    item.quality = diff < 0 ? 0 : diff
   end
 end
 
